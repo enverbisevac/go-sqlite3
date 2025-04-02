@@ -20,11 +20,10 @@ import (
 	"github.com/google/go-github/v69/github"
 )
 
-func download(prefix string) (content []byte, err error) {
+func download() (content []byte, err error) {
 	ctx := context.Background()
 	client := github.NewClientWithEnvProxy()
 	release, _, err := client.Repositories.GetLatestRelease(ctx, "utelle", "SQLite3MultipleCiphers")
-
 	if err != nil {
 		return nil, err
 	}
@@ -71,25 +70,13 @@ func main() {
 	}
 
 	// Download Amalgamation
-	amalgamation, err := download("sqlite-amalgamation-")
+	amalgamation, err := download()
 	if err != nil {
 		log.Fatalf("Failed to download: sqlite3mc-amalgamation; %s", err)
 	}
 
-	// Download Source
-	_, source, err := download("sqlite-src-")
-	if err != nil {
-		log.Fatalf("Failed to download: sqlite-src; %s", err)
-	}
-
 	// Create Amalgamation Zip Reader
 	rAmalgamation, err := zip.NewReader(bytes.NewReader(amalgamation), int64(len(amalgamation)))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Create Source Zip Reader
-	rSource, err := zip.NewReader(bytes.NewReader(source), int64(len(source)))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -112,7 +99,6 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-
 		zr, err := zf.Open()
 		if err != nil {
 			log.Fatal(err)
@@ -144,14 +130,12 @@ func main() {
 		} else {
 			_, err = io.Copy(f, zr)
 		}
-		err = scanner.Err()
 		if err != nil {
 			zr.Close()
 			f.Close()
 			log.Fatal(err)
 		}
-
-		_, err = io.WriteString(f, "#endif // USE_LIBSQLITE3\n // If users really want to link against the system sqlite3 we\n// need to make this file a noop.\n #endif")
+		_, err = io.WriteString(f, "#endif // !USE_LIBSQLITE3\n")
 		if err != nil {
 			zr.Close()
 			f.Close()

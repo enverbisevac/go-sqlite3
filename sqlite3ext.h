@@ -371,15 +371,6 @@ struct sqlite3_api_routines {
   /* Version 3.44.0 and later */
   void *(*get_clientdata)(sqlite3*,const char*);
   int (*set_clientdata)(sqlite3*, const char*, void*, void(*)(void*));
-  /* Version 3.40.0 and later */
-  int (*value_encoding)(sqlite3_value*);
-  /* Version 3.41.0 and later */
-  int (*is_interrupted)(sqlite3*);
-  /* Version 3.43.0 and later */
-  int (*stmt_explain)(sqlite3_stmt*,int);
-  /* Version 3.44.0 and later */
-  void *(*get_clientdata)(sqlite3*,const char*);
-  int (*set_clientdata)(sqlite3*, const char*, void*, void(*)(void*));
 };
 
 /*
@@ -731,5 +722,4 @@ typedef int (*sqlite3_loadext_entry)(
 #endif
 
 #endif /* SQLITE3EXT_H */
-#endif
 #endif // !USE_LIBSQLITE3
